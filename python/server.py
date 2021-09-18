@@ -26,7 +26,9 @@ async def echo_brodcast(websocket,path):
                     await conn.send(f"Outro cliente {message}")
     except websockets.exceptions.ConnectionClosed:
         print("Cliente desconectado")
-
+    finally:
+        #Retira da lista o websocket que deslogou
+        clients_connected.remove(websocket)
 
 
 async def main():
