@@ -14,9 +14,25 @@ async def echo(websocket,path):
     except websockets.exceptions.ConnectionClosed:
         print("Cliente desconectado")
 
+async def echo_brodcast(websocket,path):
+    print("Nova conexão no server")
+    clients_connected.add(websocket)
+    try:
+        async for message in websocket:
+            for conn in clients_connected:
+                #Envia para todos os clientes exeto o que realizado a comunicação
+                if conn != websocket:
+                    print(f"Mensagem recebida: {message}")
+                    await conn.send(f"Outro cliente {message}")
+    except websockets.exceptions.ConnectionClosed:
+        print("Cliente desconectado")
+
+
+
 async def main():
-    async with websockets.serve(echo, "localhost", port):
+    async with websockets.serve(echo_brodcast, "localhost", port):
         await asyncio.Future()
 
 
+clients_connected = set()
 asyncio.run(main())
